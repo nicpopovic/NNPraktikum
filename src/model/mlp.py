@@ -142,13 +142,14 @@ class MultilayerPerceptron(Classifier):
         """
         pass
 
-
-
     def classify(self, test_instance):
-        # Classify an instance given the model of the classifier
-        # You need to implement something here
-        pass
-        
+        output = test_instance
+        for layer in self.layers:
+            output = np.insert(output, 0, 1, axis=0)
+            output = layer.forward(output)
+        digit = np.argmax(output)
+        onehot = np.eye(10)[digit]
+        return digit == 7  # todo return onehot instead of bool
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
