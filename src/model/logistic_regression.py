@@ -70,7 +70,7 @@ class LogisticRegression(Classifier):
         self.performances = []
 
         # Use a logistic layer as one-neuron classification (output) layer
-        self.layer = LogisticLayer(train.input.shape[1], 1, 
+        self.layer = LogisticLayer(train.input.shape[1] + 1, 1,
                                    activation='sigmoid', 
                                    isClassifierLayer=True)
 

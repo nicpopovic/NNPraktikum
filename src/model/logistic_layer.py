@@ -86,8 +86,7 @@ class LogisticLayer():
 
         # Here you have to implement the forward pass
         self.inp = inp
-        weighted = self.weights[0] + inp * self.weights[1:]
-        outp = self._fire(weighted)
+        outp = self._fire(self.inp)
         self.outp = outp
 
         return outp
