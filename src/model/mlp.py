@@ -1,7 +1,8 @@
 
 import numpy as np
 
-from util.loss_functions import CrossEntropyError
+from util.loss_functions import CrossEntropyError, BinaryCrossEntropyError, SumSquaredError, MeanSquaredError, \
+    DifferentError, AbsoluteError
 from model.logistic_layer import LogisticLayer
 from model.classifier import Classifier
 
@@ -43,7 +44,7 @@ class MultilayerPerceptron(Classifier):
         self.epochs = epochs
         self.outputTask = outputTask  # Either classification or regression
         self.outputActivation = outputActivation
-        self.cost = cost
+        # self.cost = cost
 
         self.trainingSet = train
         self.validationSet = valid
