@@ -65,10 +65,9 @@ class Activation:
 
     @staticmethod
     def softmax(netOutput):
-        # todo: fix shitty variable naming
-        # todo: add check for numerical stability
-        exponents = exp(netOutput)
-        return divide(exponents, np.sum(exponents))
+        # todo: add check for numerical stability of exp
+        e = exp(netOutput)
+        return divide(e, np.sum(e))
         
     @staticmethod
     def softmaxPrime(netOutput):
