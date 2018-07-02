@@ -71,8 +71,21 @@ class Activation:
         
     @staticmethod
     def softmaxPrime(netOutput):
-        # Here you have to code the softmax function
-        pass
+        # compute softmax activation of input
+        sm = Activation.softmax()
+
+        # initialize Jacobian as diagonal of sm
+        J = np.diag(sm)
+
+        # todo: vectorize
+        for i in range(len(J)):
+            for j in range(len(J)):
+                if i == j:
+                    J[i][j] = sm[i] * (1 - sm[j])
+                else:
+                    J[i][j] = - sm[i] * sm[j]
+
+        return np.sum(J, axis=1)
         
     @staticmethod
     def getActivation(str):
