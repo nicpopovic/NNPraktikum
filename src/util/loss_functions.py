@@ -122,7 +122,18 @@ class CrossEntropyError(Error):
         self.errorString = 'crossentropy'
 
     def calculateError(self, target, output):
-        pass
+        # compute cross entropy between each individual predicted probability and
+        # corresponding target and then take the mean the result
+        # L = - 1/N * sum(y_i * log ( y_i_pred)) with sum taken over all i=0,1,...,N
+        # where N is the number of classes
+        xentropy = np.multiply(target, np.log(output))
+        return - np.mean(xentropy)
         
-    def calculateDerivativer(self, target, output):
-        pass
+    def calculateDerivative(self, target, output):
+        # make sure dimensionality between prediction and labelvector matches
+        assert len(output) == len(target)
+        # get number of classes (N)
+        N = len(output)
+        # compute partial derivatives of L with respect to each y_i_pred
+        # d L / d y_i_pred = - y_i / (N * y_i_pred)
+        return - np.divide(target, np.multiply(N, output))
