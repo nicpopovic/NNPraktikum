@@ -13,13 +13,14 @@ from report.performance_plot import PerformancePlot
 
 def main():
     data = MNISTSeven("../data/mnist_seven.csv", 3000, 1000, 1000,
-                      oneHot=True)
+                      oneHot=False)
 
     myMLPClassifier = MultilayerPerceptron(data.trainingSet,
                                            data.validationSet,
                                            data.testSet,
                                            learningRate=0.005,
-                                           epochs=30)
+                                           epochs=30,
+                                           loss="ce")
 
     # Report the result #
     print("=========================")
@@ -30,7 +31,7 @@ def main():
     print("Training..")
 
     print("\nMLP has been training..")
-    myMLPClassifier.train()
+    myMLPClassifier.train(verbose=True)
     print("Done..")
 
     # Do the recognizer

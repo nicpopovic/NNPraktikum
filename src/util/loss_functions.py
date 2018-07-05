@@ -136,4 +136,5 @@ class CrossEntropyError(Error):
         N = len(output)
         # compute partial derivatives of L with respect to each y_i_pred
         # d L / d y_i_pred = - y_i / (N * y_i_pred)
-        return - np.divide(target, np.multiply(N, output))
+        # return - np.divide(target, np.multiply(N, output))
+        return output - target

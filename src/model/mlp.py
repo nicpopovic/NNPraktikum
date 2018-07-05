@@ -5,6 +5,7 @@ from util.loss_functions import CrossEntropyError, BinaryCrossEntropyError, SumS
     DifferentError, AbsoluteError
 from model.logistic_layer import LogisticLayer
 from model.classifier import Classifier
+from report.evaluator import Evaluator
 
 from sklearn.metrics import accuracy_score
 
@@ -60,6 +61,8 @@ class MultilayerPerceptron(Classifier):
             self.loss = DifferentError()
         elif loss == 'absolute':
             self.loss = AbsoluteError()
+        elif loss == 'ce':
+            self.loss = CrossEntropyError()
         else:
             raise ValueError('There is no predefined loss function ' +
                              'named ' + str)
@@ -118,24 +121,24 @@ class MultilayerPerceptron(Classifier):
             output = np.insert(output, 0, 1, axis=0)
             output = layer.forward(output)
         return output
-        
-    def _compute_error(self, target):
-        """
-        Compute the total error of the network (error terms from the output layer)
-
-        Returns
-        -------
-        ndarray :
-            a numpy array (1,nOut) containing the output of the layer
-        """
-        pass
     
-    def _update_weights(self, learningRate):
+    def _update_weights(self, learningRate, error):
         """
         Update the weights of the layers by propagating back the error
         """
-        pass
-        
+        derivatives = [error]
+        weights = [[1 for _w in range(self.layers[-1].nOut+1)]]
+
+        # calculate derivatives
+        for layer in reversed(self.layers):
+            layer.computeDerivative(derivatives[-1], weights[-1][1:])
+            derivatives.append(layer.deltas)
+            weights.append(layer.weights)
+
+        # update weights
+        for layer in reversed(self.layers):
+            layer.updateWeights(learningRate)
+
     def train(self, verbose=True):
         """Train the Multi-layer Perceptrons
 
@@ -144,12 +147,28 @@ class MultilayerPerceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
+        for epoch in range(self.epochs):
+            for inp, label in zip(self.trainingSet.input, self.trainingSet.label):
+                onehot_label = self.digit_to_onehot(label)
+                # execute forward pass
+                prediction = self._feed_forward(inp)
+                # perform error computation
+                prediction_error = self.loss.calculateDerivative(onehot_label, prediction)
+                # apply weight updates
+                self._update_weights(self.learningRate, prediction_error)
+
+            train_accuracy = accuracy_score(self.trainingSet.label, self.evaluate(self.trainingSet.input))
+            validation_accuracy = accuracy_score(self.validationSet.label, self.evaluate(self.validationSet.input))
+
+            if verbose:
+                print("Epoch %i of %i" % (epoch+1, self.epochs))
+                print("Training accuracy: {0:.2f}%".format(train_accuracy*100))
+                print("Validation accuracy: {0:.2f}%".format(validation_accuracy*100))
         pass
 
     def classify(self, test_instance):
         digit = np.argmax(self._feed_forward(test_instance))
-        onehot = np.eye(10)[digit]
-        return digit == 7  # todo return onehot instead of bool
+        return digit
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -176,3 +195,6 @@ class MultilayerPerceptron(Classifier):
         self.validationSet.input = np.delete(self.validationSet.input, 0,
                                               axis=1)
         self.testSet.input = np.delete(self.testSet.input, 0, axis=1)
+
+    def digit_to_onehot(self, digit):
+        return np.eye(10)[digit]

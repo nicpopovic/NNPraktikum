@@ -72,7 +72,7 @@ class Activation:
     @staticmethod
     def softmaxPrime(netOutput):
         # compute softmax activation of input
-        sm = Activation.softmax()
+        sm = Activation.softmax(netOutput)
 
         # initialize Jacobian as diagonal of sm
         J = np.diag(sm)
