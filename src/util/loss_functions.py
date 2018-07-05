@@ -122,8 +122,8 @@ class CrossEntropyError(Error):
         self.errorString = 'crossentropy'
 
     def calculateError(self, target, output):
-        # compute cross entropy between each individual predicted probability and
-        # corresponding target and then take the mean the result
+        # compute cross entropy between each individual predicted class probability and
+        # corresponding target and then take the mean over the result
         # L = - 1/N * sum(y_i * log ( y_i_pred)) with sum taken over all i=0,1,...,N
         # where N is the number of classes
         xentropy = np.multiply(target, np.log(output))
