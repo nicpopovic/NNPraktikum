@@ -92,7 +92,6 @@ class MultilayerPerceptron(Classifier):
                                               axis=1)
         self.testSet.input = np.insert(self.testSet.input, 0, 1, axis=1)
 
-
     def _get_layer(self, layer_index):
         return self.layers[layer_index]
 
@@ -114,6 +113,11 @@ class MultilayerPerceptron(Classifier):
         # Here you have to propagate forward through the layers
         # And remember the activation values of each layer
         """
+        output = inp
+        for layer in self.layers:
+            output = np.insert(output, 0, 1, axis=0)
+            output = layer.forward(output)
+        return output
         
     def _compute_error(self, target):
         """
@@ -143,11 +147,7 @@ class MultilayerPerceptron(Classifier):
         pass
 
     def classify(self, test_instance):
-        output = test_instance
-        for layer in self.layers:
-            output = np.insert(output, 0, 1, axis=0)
-            output = layer.forward(output)
-        digit = np.argmax(output)
+        digit = np.argmax(self._feed_forward(test_instance))
         onehot = np.eye(10)[digit]
         return digit == 7  # todo return onehot instead of bool
 
