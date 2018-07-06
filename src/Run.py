@@ -19,7 +19,8 @@ def main():
                                            data.validationSet,
                                            data.testSet,
                                            learningRate=0.005,
-                                           epochs=30,
+                                           epochs=50,
+                                           weightDecay=0.00005,
                                            loss="ce")
 
     # Report the result #
@@ -47,8 +48,8 @@ def main():
     evaluator.printAccuracy(data.testSet, mlpPred)
 
     # Draw
-    # plot = PerformancePlot("MLP validation")
-    # plot.draw_performance_epoch(myMLPClassifier.performances, myMLPClassifier.epochs)
+    plot = PerformancePlot("MLP validation")
+    plot.draw_performance_epoch(myMLPClassifier.performances, myMLPClassifier.epochs)
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@ class MultilayerPerceptron(Classifier):
 
     def __init__(self, train, valid, test, layers=None, inputWeights=None,
                  outputTask='classification', outputActivation='softmax',
-                 loss='bce', learningRate=0.01, epochs=50):
+                 loss='bce', learningRate=0.01, weightDecay=0.00005, epochs=50):
 
         """
         A MNIST recognizer based on multi-layer perceptron algorithm
@@ -45,6 +45,7 @@ class MultilayerPerceptron(Classifier):
         self.epochs = epochs
         self.outputTask = outputTask  # Either classification or regression
         self.outputActivation = outputActivation
+        self.weightDecay = weightDecay
         # self.cost = cost
 
         self.trainingSet = train
@@ -126,18 +127,21 @@ class MultilayerPerceptron(Classifier):
         """
         Update the weights of the layers by propagating back the error
         """
-        derivatives = [error]
-        weights = [[1 for _w in range(self.layers[-1].nOut+1)]]
+        derivatives = []
+        weights = []
 
         # calculate derivatives
-        for layer in reversed(self.layers):
-            layer.computeDerivative(derivatives[-1], weights[-1][1:])
+        for i, layer in enumerate(reversed(self.layers)):
+            if i == 0:
+                layer.computeDerivative(error, 1.0)
+            else:
+                layer.computeDerivative(derivatives[-1], weights[-1][1:])
             derivatives.append(layer.deltas)
             weights.append(layer.weights)
 
         # update weights
         for layer in reversed(self.layers):
-            layer.updateWeights(learningRate)
+            layer.updateWeights(learningRate, self.weightDecay)
 
     def train(self, verbose=True):
         """Train the Multi-layer Perceptrons
@@ -159,6 +163,8 @@ class MultilayerPerceptron(Classifier):
 
             train_accuracy = accuracy_score(self.trainingSet.label, self.evaluate(self.trainingSet.input))
             validation_accuracy = accuracy_score(self.validationSet.label, self.evaluate(self.validationSet.input))
+
+            self.performances.append(validation_accuracy)
 
             if verbose:
                 print("Epoch %i of %i" % (epoch+1, self.epochs))

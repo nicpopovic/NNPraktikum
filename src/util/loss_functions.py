@@ -130,11 +130,4 @@ class CrossEntropyError(Error):
         return - np.mean(xentropy)
         
     def calculateDerivative(self, target, output):
-        # make sure dimensionality between prediction and labelvector matches
-        assert len(output) == len(target)
-        # get number of classes (N)
-        N = len(output)
-        # compute partial derivatives of L with respect to each y_i_pred
-        # d L / d y_i_pred = - y_i / (N * y_i_pred)
-        # return - np.divide(target, np.multiply(N, output))
         return output - target
