@@ -3,6 +3,7 @@
 from __future__ import division
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
 
 
 class Evaluator:
@@ -35,3 +36,29 @@ class Evaluator:
     def printAccuracy(self, testSet, pred):
         print("Accuracy of the recognizer: %.2f%%" %
               (accuracy_score(testSet.label, pred)*100))
+
+    def returnAccuracy(self, testSet, pred):
+        return accuracy_score(testSet.label, pred)
+
+    def plotAccuracyHistogramm(self, testSet, pred, savename=None):
+        correct = [0 for i in range(10)]
+        total = [0 for i in range(10)]
+
+        for label, result in zip(testSet.label, pred):
+            total[label] = total[label] + 1
+            if label == result:
+                correct[label] = correct[label] + 1
+
+        histogram = [100*cr/tot for cr, tot in zip(correct, total)]
+
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(range(10), histogram)
+        ax.set_xlabel('Digit')
+        ax.set_ylabel('Accuracy [%]')
+        ax.set_title('Accuracy by digit')
+        ax.set_xticks(range(10))
+        ax.set_ylim(0, 100)
+        if savename:
+            plt.savefig(savename)
+        else:
+            plt.show()

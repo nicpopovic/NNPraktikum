@@ -70,31 +70,48 @@ class MultilayerPerceptron(Classifier):
 
         # Record the performance of each epoch for later usages
         # e.g. plotting, reporting..
-        self.performances = []
+        self.training_performances = []
+        self.validation_performances = []
 
         self.layers = layers
 
         # Build up the network from specific layers
-        self.layers = []
+        if layers is None:
+            self.layers = []
 
-        # Input layer
-        inputActivation = "sigmoid"
-        self.layers.append(LogisticLayer(train.input.shape[1] + 1, 128,
-                           None, inputActivation, False))
+            # Input layer
+            inputActivation = "sigmoid"
+            self.layers.append(LogisticLayer(train.input.shape[1], 128,
+                               None, inputActivation, False))
 
-        # Output layer
-        outputActivation = "softmax"
-        self.layers.append(LogisticLayer(128, 10, 
-                           None, outputActivation, True))
+            # Output layer
+            outputActivation = "softmax"
+            self.layers.append(LogisticLayer(128, 10,
+                               None, outputActivation, True))
+        else:
+            self.layers = []
+
+            # Input layer
+            inputActivation = "sigmoid"
+            self.layers.append(LogisticLayer(train.input.shape[1], layers,
+                                             None, inputActivation, False))
+
+            # Output layer
+            outputActivation = "softmax"
+            self.layers.append(LogisticLayer(layers, 10,
+                                             None, outputActivation, True))
 
         self.inputWeights = inputWeights
 
+        # The code below was moved outside of the mlp in order to avoid reloading the data set every time a new MLP is tested
+        """
         # add bias values ("1"s) at the beginning of all data sets
         self.trainingSet.input = np.insert(self.trainingSet.input, 0, 1,
                                             axis=1)
         self.validationSet.input = np.insert(self.validationSet.input, 0, 1,
                                               axis=1)
         self.testSet.input = np.insert(self.testSet.input, 0, 1, axis=1)
+        """
 
     def _get_layer(self, layer_index):
         return self.layers[layer_index]
@@ -164,7 +181,8 @@ class MultilayerPerceptron(Classifier):
             train_accuracy = accuracy_score(self.trainingSet.label, self.evaluate(self.trainingSet.input))
             validation_accuracy = accuracy_score(self.validationSet.label, self.evaluate(self.validationSet.input))
 
-            self.performances.append(validation_accuracy)
+            self.validation_performances.append(validation_accuracy)
+            self.training_performances.append(train_accuracy)
 
             if verbose:
                 print("Epoch %i of %i" % (epoch+1, self.epochs))
@@ -191,8 +209,6 @@ class MultilayerPerceptron(Classifier):
         """
         if test is None:
             test = self.testSet.input
-        # Once you can classify an instance, just use map for all of the test
-        # set.
         return list(map(self.classify, test))
 
     def __del__(self):
